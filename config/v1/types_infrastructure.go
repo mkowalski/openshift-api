@@ -691,7 +691,44 @@ type BareMetalPlatformLoadBalancer struct {
 
 // BareMetalPlatformSpec holds the desired state of the BareMetal infrastructure provider.
 // This only includes fields that can be modified in the cluster.
-type BareMetalPlatformSpec struct{}
+// +kubebuilder:validation:XValidation:rule="!has(oldSelf.apiServerInternalIPs) || has(self.apiServerInternalIPs)", message="Value is required once set"
+// +kubebuilder:validation:XValidation:rule="!has(oldSelf.ingressIPs) || has(self.ingressIPs)", message="Value is required once set"
+type BareMetalPlatformSpec struct {
+	// apiServerInternalIPs are the IP addresses to contact the Kubernetes API
+	// server that can be used by components inside the cluster, like kubelets
+	// using the infrastructure rather than Kubernetes networking. These are the
+	// IPs for a self-hosted load balancer in front of the API servers.
+	// In dual stack clusters this list contains two IP addresses.
+	// In single stack clusters a single IP address is expected.
+	// When omitted, values from the status.apiServerInternalIPs will be used.
+	// Once set, the list cannot be completely removed (but its second entry can).
+	//
+	// +kubebuilder:validation:Format=ip
+	// +kubebuilder:validation:MaxItems=2
+	// +listType=set
+	// +optional
+	APIServerInternalIPs []string `json:"apiServerInternalIPs"`
+
+	// ingressIPs are the external IPs which route to the default ingress
+	// controller. The IPs are suitable targets of a wildcard DNS record used to
+	// resolve default route host names.
+	// In dual stack clusters this list contains two IP addresses.
+	// In single stack clusters a single IP address is expected.
+	// When omitted, values from the status.ingressIPs will be used.
+	// Once set, the list cannot be completely removed (but its second entry can).
+	//
+	// +kubebuilder:validation:Format=ip
+	// +kubebuilder:validation:MaxItems=2
+	// +listType=set
+	// +optional
+	IngressIPs []string `json:"ingressIPs"`
+
+	// IP networks used to connect all the OpenShift cluster nodes. Each network
+	// is provided in the CIDR format, e.g. "192.0.2.0/24"
+	// +listType=set
+	// +optional
+	MachineNetworks []string `json:"machineNetworks"`
+}
 
 // BareMetalPlatformStatus holds the current status of the BareMetal infrastructure provider.
 // For more information about the network architecture used with the BareMetal platform type, see:
@@ -744,6 +781,11 @@ type BareMetalPlatformStatus struct {
 	// +openshift:enable:FeatureSets=CustomNoUpgrade;TechPreviewNoUpgrade
 	// +optional
 	LoadBalancer *BareMetalPlatformLoadBalancer `json:"loadBalancer,omitempty"`
+
+	// IP networks used to connect all the OpenShift cluster nodes.
+	// +listType=set
+	// +optional
+	MachineNetworks []string `json:"machineNetworks"`
 }
 
 // OpenStackPlatformLoadBalancer defines the load balancer used by the cluster on OpenStack platform.
@@ -769,7 +811,44 @@ type OpenStackPlatformLoadBalancer struct {
 
 // OpenStackPlatformSpec holds the desired state of the OpenStack infrastructure provider.
 // This only includes fields that can be modified in the cluster.
-type OpenStackPlatformSpec struct{}
+// +kubebuilder:validation:XValidation:rule="!has(oldSelf.apiServerInternalIPs) || has(self.apiServerInternalIPs)", message="Value is required once set"
+// +kubebuilder:validation:XValidation:rule="!has(oldSelf.ingressIPs) || has(self.ingressIPs)", message="Value is required once set"
+type OpenStackPlatformSpec struct {
+	// apiServerInternalIPs are the IP addresses to contact the Kubernetes API
+	// server that can be used by components inside the cluster, like kubelets
+	// using the infrastructure rather than Kubernetes networking. These are the
+	// IPs for a self-hosted load balancer in front of the API servers.
+	// In dual stack clusters this list contains two IP addresses.
+	// In single stack clusters a single IP address is expected.
+	// When omitted, values from the status.apiServerInternalIPs will be used.
+	// Once set, the list cannot be completely removed (but its second entry can).
+	//
+	// +kubebuilder:validation:Format=ip
+	// +kubebuilder:validation:MaxItems=2
+	// +listType=set
+	// +optional
+	APIServerInternalIPs []string `json:"apiServerInternalIPs"`
+
+	// ingressIPs are the external IPs which route to the default ingress
+	// controller. The IPs are suitable targets of a wildcard DNS record used to
+	// resolve default route host names.
+	// In dual stack clusters this list contains two IP addresses.
+	// In single stack clusters a single IP address is expected.
+	// When omitted, values from the status.ingressIPs will be used.
+	// Once set, the list cannot be completely removed (but its second entry can).
+	//
+	// +kubebuilder:validation:Format=ip
+	// +kubebuilder:validation:MaxItems=2
+	// +listType=set
+	// +optional
+	IngressIPs []string `json:"ingressIPs"`
+
+	// IP networks used to connect all the OpenShift cluster nodes. Each network
+	// is provided in the CIDR format, e.g. "192.0.2.0/24"
+	// +listType=set
+	// +optional
+	MachineNetworks []string `json:"machineNetworks"`
+}
 
 // OpenStackPlatformStatus holds the current status of the OpenStack infrastructure provider.
 type OpenStackPlatformStatus struct {
@@ -823,6 +902,11 @@ type OpenStackPlatformStatus struct {
 	// +kubebuilder:default={"type": "OpenShiftManagedDefault"}
 	// +optional
 	LoadBalancer *OpenStackPlatformLoadBalancer `json:"loadBalancer,omitempty"`
+
+	// IP networks used to connect all the OpenShift cluster nodes.
+	// +listType=set
+	// +optional
+	MachineNetworks []string `json:"machineNetworks"`
 }
 
 // OvirtPlatformLoadBalancer defines the load balancer used by the cluster on Ovirt platform.
@@ -1086,6 +1170,8 @@ type VSpherePlatformNodeNetworking struct {
 // VSpherePlatformSpec holds the desired state of the vSphere infrastructure provider.
 // In the future the cloud provider operator, storage operator and machine operator will
 // use these fields for configuration.
+// +kubebuilder:validation:XValidation:rule="!has(oldSelf.apiServerInternalIPs) || has(self.apiServerInternalIPs)", message="Value is required once set"
+// +kubebuilder:validation:XValidation:rule="!has(oldSelf.ingressIPs) || has(self.ingressIPs)", message="Value is required once set"
 type VSpherePlatformSpec struct {
 	// vcenters holds the connection details for services to communicate with vCenter.
 	// Currently, only a single vCenter is supported.
@@ -1109,6 +1195,41 @@ type VSpherePlatformSpec struct {
 	// return the first one found.
 	// +optional
 	NodeNetworking VSpherePlatformNodeNetworking `json:"nodeNetworking,omitempty"`
+
+	// apiServerInternalIPs are the IP addresses to contact the Kubernetes API
+	// server that can be used by components inside the cluster, like kubelets
+	// using the infrastructure rather than Kubernetes networking. These are the
+	// IPs for a self-hosted load balancer in front of the API servers.
+	// In dual stack clusters this list contains two IP addresses.
+	// In single stack clusters a single IP address is expected.
+	// When omitted, values from the status.apiServerInternalIPs will be used.
+	// Once set, the list cannot be completely removed (but its second entry can).
+	//
+	// +kubebuilder:validation:Format=ip
+	// +kubebuilder:validation:MaxItems=2
+	// +listType=set
+	// +optional
+	APIServerInternalIPs []string `json:"apiServerInternalIPs"`
+
+	// ingressIPs are the external IPs which route to the default ingress
+	// controller. The IPs are suitable targets of a wildcard DNS record used to
+	// resolve default route host names.
+	// In dual stack clusters this list contains two IP addresses.
+	// In single stack clusters a single IP address is expected.
+	// When omitted, values from the status.ingressIPs will be used.
+	// Once set, the list cannot be completely removed (but its second entry can).
+	//
+	// +kubebuilder:validation:Format=ip
+	// +kubebuilder:validation:MaxItems=2
+	// +listType=set
+	// +optional
+	IngressIPs []string `json:"ingressIPs"`
+
+	// IP networks used to connect all the OpenShift cluster nodes. Each network
+	// is provided in the CIDR format, e.g. "192.0.2.0/24"
+	// +listType=set
+	// +optional
+	MachineNetworks []string `json:"machineNetworks"`
 }
 
 // VSpherePlatformStatus holds the current status of the vSphere infrastructure provider.
@@ -1160,6 +1281,11 @@ type VSpherePlatformStatus struct {
 	// +openshift:enable:FeatureSets=CustomNoUpgrade;TechPreviewNoUpgrade
 	// +optional
 	LoadBalancer *VSpherePlatformLoadBalancer `json:"loadBalancer,omitempty"`
+
+	// IP networks used to connect all the OpenShift cluster nodes.
+	// +listType=set
+	// +optional
+	MachineNetworks []string `json:"machineNetworks"`
 }
 
 // IBMCloudServiceEndpoint stores the configuration of a custom url to
