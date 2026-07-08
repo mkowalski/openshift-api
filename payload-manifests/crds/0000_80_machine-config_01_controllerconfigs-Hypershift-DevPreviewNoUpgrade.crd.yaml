@@ -68,6 +68,9 @@ spec:
                   payload of the bgp-vip-config ConfigMap) for rendering the frr-k8s
                   static pod peer file on control plane nodes. Only set when BGP-based
                   VIP management is enabled.
+                  When set, the value must be between 1 and 65536 characters long.
+                maxLength: 65536
+                minLength: 1
                 type: string
               cloudProviderCAData:
                 description: cloudProviderCAData specifies the cloud provider CA data

@@ -117,7 +117,10 @@ type ControllerConfigSpec struct {
 	// payload of the bgp-vip-config ConfigMap) for rendering the frr-k8s
 	// static pod peer file on control plane nodes. Only set when BGP-based
 	// VIP management is enabled.
+	// When set, the value must be between 1 and 65536 characters long.
 	// +openshift:enable:FeatureGate=BGPBasedVIPManagement
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=65536
 	// +optional
 	BGPVIPPeersJSON string `json:"bgpVIPPeersJSON,omitempty"`
 
