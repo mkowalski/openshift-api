@@ -398,6 +398,7 @@ infrastructures.config.openshift.io:
   - AWSDualStackInstall
   - AzureClusterHostedDNSInstall
   - AzureDualStackInstall
+  - BGPBasedVIPManagement
   - DualReplica
   - DyanmicServiceEndpointIBMCloud
   - MutableTopology

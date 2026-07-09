@@ -44,6 +44,9 @@
                         "name": "AzureMultiDisk"
                     },
                     {
+                        "name": "BGPBasedVIPManagement"
+                    },
+                    {
                         "name": "BootcNodeManagement"
                     },
                     {
