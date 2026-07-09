@@ -10387,9 +10387,10 @@ func schema_openshift_api_config_v1_BareMetalPlatformStatus(ref common.Reference
 					},
 					"vipManagement": {
 						SchemaProps: spec.SchemaProps{
-							Description: "vipManagement indicates which VIP management mechanism is active on this cluster. When set to \"BGP\", kube-vip (Routing Table Mode) and frr-k8s are deployed as static pods to advertise VIPs via BGP, replacing the default keepalived/VRRP mechanism. When omitted or set to \"Keepalived\", the default keepalived-based VIP management is used.",
+							Description: "vipManagement indicates which VIP management mechanism is active on this cluster. Allowed values are `Keepalived`, `BGP`, and omitted. Once set to a non-empty value, this field is immutable. When set to `BGP`, kube-vip (Routing Table Mode) and frr-k8s are deployed as static pods to advertise VIPs via BGP, replacing the default keepalived/VRRP mechanism. When set to `Keepalived`, the default keepalived-based VIP management is used. When omitted, the default keepalived-based VIP management is used.\n\nPossible enum values:\n - `\"BGP\"` means the VIPs are advertised via BGP by kube-vip (Routing Table Mode) and frr-k8s running as static pods.\n - `\"Keepalived\"` means the VIPs are managed by the default keepalived/VRRP mechanism.",
 							Type:        []string{"string"},
 							Format:      "",
+							Enum:        []interface{}{"BGP", "Keepalived"},
 						},
 					},
 					"dnsRecordsType": {
